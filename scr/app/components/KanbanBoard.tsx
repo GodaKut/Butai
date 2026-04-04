@@ -38,9 +38,13 @@ export function KanbanBoard() {
   };
 
   const addApartment = async (apartment: Omit<Apartment, 'id'>) => {
+    const newApartment = {
+      ...apartment,
+      id: Date.now().toString(),
+    };
     const { data, error } = await supabase
       .from('apartments')
-      .insert([{ ...apartment }])
+      .insert([newApartment])
       .select();
     if (!error && data && data[0]) {
       setApartments((prev) => [...prev, data[0]]);
