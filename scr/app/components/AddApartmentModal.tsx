@@ -48,8 +48,9 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
         district: scrapedData.district || 'Unknown District',
         yearBuilt: scrapedData.yearBuilt || new Date().getFullYear(),
         price: scrapedData.price || 0,
-        floor: scrapedData.floor !== undefined && scrapedData.floor !== null && scrapedData.floor !== '' ? Number(scrapedData.floor) : null,
-        imageUrl: scrapedData.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image',
+        // Try to extract floor as a number from scrapedData or fallback to null
+        floor: scrapedData.floor !== undefined && scrapedData.floor !== null && scrapedData.floor !== '' && !isNaN(Number(scrapedData.floor)) ? Number(scrapedData.floor) : null,
+        imageUrl: scrapedData.imageUrl && scrapedData.imageUrl !== '' ? scrapedData.imageUrl : 'https://via.placeholder.com/400x300?text=No+Image',
         url: scrapedData.url || url, // fallback to the entered url
         status: 'interested',
       });
