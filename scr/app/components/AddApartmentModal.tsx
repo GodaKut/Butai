@@ -48,7 +48,7 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
         district: scrapedData.district || 'Unknown District',
         yearBuilt: scrapedData.yearBuilt || new Date().getFullYear(),
         price: scrapedData.price || 0,
-        floor: scrapedData.floor || 'N/A',
+        floor: scrapedData.floor !== undefined && scrapedData.floor !== null && scrapedData.floor !== '' ? Number(scrapedData.floor) : null,
         imageUrl: scrapedData.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image',
         url: scrapedData.url || url, // fallback to the entered url
         status: 'interested',
