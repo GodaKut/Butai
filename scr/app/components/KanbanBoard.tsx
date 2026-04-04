@@ -51,6 +51,11 @@ export function KanbanBoard() {
     }
   };
 
+  const deleteApartment = async (apartmentId: number) => {
+    await supabase.from('apartments').delete().eq('id', apartmentId);
+    setApartments((prev) => prev.filter((apt) => apt.id !== apartmentId));
+  };
+
   if (loading) {
     return <div className="p-8 text-center">Loading...</div>;
   }
@@ -79,6 +84,7 @@ export function KanbanBoard() {
               title={column.title}
               apartments={apartments.filter((apt) => apt.status === column.id)}
               onMoveApartment={moveApartment}
+              onDeleteApartment={deleteApartment}
             />
           ))}
         </div>

@@ -7,9 +7,10 @@ interface KanbanColumnProps {
   title: string;
   apartments: Apartment[];
   onMoveApartment: (apartmentId: string, newStatus: Apartment['status']) => void;
+  onDeleteApartment?: (apartmentId: number | string) => void;
 }
 
-export function KanbanColumn({ columnId, title, apartments, onMoveApartment }: KanbanColumnProps) {
+export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onDeleteApartment }: KanbanColumnProps) {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'apartment',
     drop: (item: { id: string }) => {
@@ -35,7 +36,17 @@ export function KanbanColumn({ columnId, title, apartments, onMoveApartment }: K
         }`}
       >
         {apartments.map((apartment) => (
-          <ApartmentCard key={apartment.id} apartment={apartment} />
+          <div key={apartment.id} className="relative">
+            <ApartmentCard apartment={apartment} />
+            {onDeleteApartment && (
+              <button
+                className="absolute top-2 right-2 bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-700"
+                onClick={() => onDeleteApartment(apartment.id)}
+              >
+                Delete
+              </button>
+            )}
+          </div>
         ))}
       </div>
     </div>
