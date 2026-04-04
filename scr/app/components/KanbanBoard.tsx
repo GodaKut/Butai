@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Apartment } from '../types/apartment';
 import { KanbanColumn } from './KanbanColumn';
@@ -13,8 +13,15 @@ const COLUMNS = [
 ] as const;
 
 export function KanbanBoard() {
-  const [apartments, setApartments] = useState<Apartment[]>([]);
+  const [apartments, setApartments] = useState<Apartment[]>(() => {
+    const saved = localStorage.getItem('apartments');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('apartments', JSON.stringify(apartments));
+  }, [apartments]);
 
   const moveApartment = (apartmentId: string, newStatus: Apartment['status']) => {
     setApartments((prev) =>
