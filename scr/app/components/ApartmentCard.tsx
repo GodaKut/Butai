@@ -66,7 +66,7 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
             <Calendar className="w-4 h-4" />
             <span>Built in {apartment.yearBuilt}</span>
           </div>
-          {apartment.floor && (
+          {apartment.floor !== null && apartment.floor !== undefined && (
             <span className="text-xs bg-gray-100 px-2 py-1 rounded">
               Floor: {apartment.floor}
             </span>
