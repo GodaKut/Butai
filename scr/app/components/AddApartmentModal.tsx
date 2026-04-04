@@ -42,15 +42,15 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
       
       console.log('Scraped apartment data:', scrapedData);
 
-      // Add the apartment with scraped data
+      // Add the apartment with scraped data, ensuring url and imageUrl are set
       onAdd({
         address: scrapedData.address || 'Unknown Address',
         district: scrapedData.district || 'Unknown District',
         yearBuilt: scrapedData.yearBuilt || new Date().getFullYear(),
         price: scrapedData.price || 0,
-        floor: scrapedData.floor,
-        imageUrl: scrapedData.imageUrl || '',
-        url: scrapedData.url,
+        floor: scrapedData.floor || 'N/A',
+        imageUrl: scrapedData.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image',
+        url: scrapedData.url || url, // fallback to the entered url
         status: 'interested',
       });
 
