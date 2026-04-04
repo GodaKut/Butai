@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { Apartment } from '../types/apartment';
 import { KanbanColumn } from './KanbanColumn';
 import { AddApartmentModal } from './AddApartmentModal';
+import { supabase } from '../../../utils/supabase/client';
 
 const COLUMNS = [
   { id: 'interested', title: 'Interested' },
@@ -13,31 +14,42 @@ const COLUMNS = [
 ] as const;
 
 export function KanbanBoard() {
-  const [apartments, setApartments] = useState<Apartment[]>(() => {
-    const saved = localStorage.getItem('apartments');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [apartments, setApartments] = useState<Apartment[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem('apartments', JSON.stringify(apartments));
-  }, [apartments]);
+    async function fetchApartments() {
+      setLoading(true);
+      const { data, error } = await supabase.from('apartments').select('*');
+      if (!error && data) {
+        setApartments(data);
+      }
+      setLoading(false);
+    }
+    fetchApartments();
+  }, []);
 
-  const moveApartment = (apartmentId: string, newStatus: Apartment['status']) => {
+  const moveApartment = async (apartmentId: string, newStatus: Apartment['status']) => {
     setApartments((prev) =>
-      prev.map((apt) =>
-        apt.id === apartmentId ? { ...apt, status: newStatus } : apt
-      )
+      prev.map((apt) => (apt.id === apartmentId ? { ...apt, status: newStatus } : apt))
     );
+    await supabase.from('apartments').update({ status: newStatus }).eq('id', apartmentId);
   };
 
-  const addApartment = (apartment: Omit<Apartment, 'id'>) => {
-    const newApartment: Apartment = {
-      ...apartment,
-      id: Date.now().toString(),
-    };
-    setApartments((prev) => [...prev, newApartment]);
+  const addApartment = async (apartment: Omit<Apartment, 'id'>) => {
+    const { data, error } = await supabase
+      .from('apartments')
+      .insert([{ ...apartment }])
+      .select();
+    if (!error && data && data[0]) {
+      setApartments((prev) => [...prev, data[0]]);
+    }
   };
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading...</div>;
+  }
 
   return (
     <div className="h-screen flex flex-col">
