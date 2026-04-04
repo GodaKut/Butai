@@ -40,7 +40,7 @@ export function KanbanBoard() {
   const addApartment = async (apartment: Omit<Apartment, 'id'>) => {
     const newApartment = {
       ...apartment,
-      id: Date.now().toString(),
+      id: Date.now(), // Use a number for int8 compatibility
     };
     const { data, error } = await supabase
       .from('apartments')
