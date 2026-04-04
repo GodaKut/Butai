@@ -127,12 +127,19 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       yearBuilt = new Date().getFullYear();
     }
 
-    // Extract floor information
-    const floorPattern = /Aukštas:<\/dt>\s*<dd[^>]*>([^<]+)<\/dd>/i;
-    const floorAlt = /aukštas[^>]*>.*?(\d+)[^<]*<\//i;
-    let floor = extractText(floorPattern);
-    if (!floor) {
-      floor = extractText(floorAlt);
+    // Extract floor information (robust for Aukštas and floor.svg)
+    let floor = '';
+    const floorSvgPattern = /<dt>[^<]*<img[^>]*floor\.svg[^>]*>[^<]*Aukštas:[^<]*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>(\d+)<\/span>/i;
+    const floorSvgMatch = html.match(floorSvgPattern);
+    if (floorSvgMatch) {
+      floor = floorSvgMatch[1];
+    } else {
+      const floorPattern = /Aukštas:<\/dt>\s*<dd[^>]*>([^<]+)<\/dd>/i;
+      const floorAlt = /aukštas[^>]*>.*?(\d+)[^<]*<\//i;
+      floor = extractText(floorPattern);
+      if (!floor) {
+        floor = extractText(floorAlt);
+      }
     }
 
     // Extract image URL
@@ -150,7 +157,7 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       district,
       yearBuilt,
       price,
-      floor,
+      floor: floor ? Number(floor) : null,
       imageUrl,
       url,
     });
