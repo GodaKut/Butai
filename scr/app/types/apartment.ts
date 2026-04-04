@@ -5,7 +5,7 @@ export interface Apartment {
   yearBuilt: number;
   price: number;
   imageUrl: string;
-  floor?: string;
+  floor: string;
   url: string;
   status: 'interested' | 'patricija-approves' | 'to-view' | 'viewed' | 'offer';
 }
