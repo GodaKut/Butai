@@ -1,12 +1,13 @@
 import { useDrag } from 'react-dnd';
-import { MapPin, Calendar, Euro, ExternalLink } from 'lucide-react';
+import { MapPin, Calendar, Euro, ExternalLink, Trash2 } from 'lucide-react';
 import { Apartment, calculateFirstInstallment } from '../types/apartment';
 
 interface ApartmentCardProps {
   apartment: Apartment;
+  onDelete?: (id: number | string) => void;
 }
 
-export function ApartmentCard({ apartment }: ApartmentCardProps) {
+export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'apartment',
     item: { id: apartment.id },
@@ -24,6 +25,15 @@ export function ApartmentCard({ apartment }: ApartmentCardProps) {
         isDragging ? 'opacity-50' : 'opacity-100'
       }`}
     >
+      {onDelete && (
+        <button
+          className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-700 text-white rounded-full p-1 shadow"
+          onClick={(e) => { e.stopPropagation(); onDelete(apartment.id); }}
+          title="Delete listing"
+        >
+          <Trash2 className="w-5 h-5" />
+        </button>
+      )}
       {apartment.imageUrl && (
         <a 
           href={apartment.url} 
