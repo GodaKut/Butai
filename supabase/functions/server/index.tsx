@@ -129,7 +129,7 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
 
     // Extract floor information (robust for Aukštas and floor.svg)
     let floor = '';
-    const floorSvgPattern = /<dt>[^<]*<img[^>]*floor\.svg[^>]*>[^<]*Aukštas:[^<]*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>(\d+)<\/span>/i;
+    const floorSvgPattern = /<dt>[\s\S]*?<img[^>]*floor\.svg[^>]*>[\s\S]*?Aukštas:[\s\S]*?<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d+)\s*<\/span>/i;
     const floorSvgMatch = html.match(floorSvgPattern);
     if (floorSvgMatch) {
       floor = floorSvgMatch[1];
