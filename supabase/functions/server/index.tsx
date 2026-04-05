@@ -131,24 +131,21 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     let currentFloor = '';
     let totalFloors = '';
 
-    // Match all dt/dd pairs
-    // Match all dt/dd pairs
-    const spanPattern = /<dt[^>]*>\s*([^<]+)\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d+)\s*<\/span>/gi;
-    const matches = [...html.matchAll(spanPattern)];
-
-    for (const match of matches) {
-      const dtText = match[1].trim();
-      const ddValue = match[2].trim();
-
-      if (/Aukštas/i.test(dtText)) {
-        currentFloor = ddValue;
-      }
-      if (/Aukštų/i.test(dtText)) {
-        totalFloors = ddValue;
-      }
+    // Current floor: "Aukštas:"
+    const currentFloorPattern = /Aukštas:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d{1,2})\s*<\/span>/i;
+    const currentMatch = html.match(currentFloorPattern);
+    if (currentMatch) {
+      currentFloor = currentMatch[1].trim();
     }
 
-    // Combine
+    // Total floors: "Aukštų sk.:"
+    const totalFloorPattern = /Aukštų sk.:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d{1,2})\s*<\/span>/i;
+    const totalMatch = html.match(totalFloorPattern);
+    if (totalMatch) {
+      totalFloors = totalMatch[1].trim();
+    }
+
+    // Combine into "floor/totalFloors"
     let floor = '';
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
