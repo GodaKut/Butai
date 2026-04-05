@@ -177,6 +177,8 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
 
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
     console.log(html.match(/Aukštas[\s\S]{0,200}/i));
+    console.log("HAS AUKSTAS:", html.includes("Aukštas"));
+    console.log("HAS FLOOR.SVG:", html.includes("floor.svg"));
     return c.json({
       address,
       district,
