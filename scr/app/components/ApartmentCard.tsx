@@ -20,7 +20,6 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
 
   return (
     <div
-      ref={drag}
       className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-move transition-opacity hover:shadow-md ${
         isDragging ? 'opacity-50' : 'opacity-100'
       }`}
@@ -35,11 +34,12 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
         </button>
       )}
       {apartment.imageUrl && (
-        <a 
+        <a
+          ref={drag} 
           href={apartment.url} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="block relative group"
+          className="block relative group cursor-move"
           onClick={(e) => e.stopPropagation()}
         >
           <img
