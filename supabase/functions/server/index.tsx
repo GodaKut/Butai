@@ -151,14 +151,13 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     }
 
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
-    console.log(html.includes('Aukštas'));
-    console.log(html.includes('floor.svg'));
+    console.log(html.match(/Aukštas[\s\S]{0,200}/i));
     return c.json({
       address,
       district,
       yearBuilt,
       price,
-      floor: floor ? Number(floor) : null,
+      floor,
       imageUrl,
       url,
     });
