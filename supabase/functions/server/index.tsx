@@ -1,7 +1,6 @@
 import { Hono } from "npm:hono";
 import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
-import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 import * as kv from "./kv_store.tsx";
 const app = new Hono();
 
@@ -128,122 +127,42 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       yearBuilt = new Date().getFullYear();
     }
 
-    const doc = new DOMParser().parseFromString(html, "text/html");
-
     let rooms: number | null = null;
     let area: number | null = null;
-    let summaryFloor: number | null = null;
-
-    if (doc) {
-      const summary = doc.querySelector(".obj-summary-details");
-
-      console.log("SUMMARY FOUND:", !!summary);
-
-      if (summary) {
-        const spans = summary.querySelectorAll("span");
-
-        spans.forEach((span) => {
-          const text = span.textContent?.trim() || "";
-          console.log("SPAN:", text);
-
-          if (text.includes("kamb")) {
-            const match = text.match(/\d+/);
-            if (match) rooms = parseInt(match[0]);
-          }
-
-          if (text.includes("m²")) {
-            const match = text.match(/[\d.,]+/);
-            if (match) area = parseFloat(match[0].replace(",", "."));
-          }
-
-          if (text.includes("aukšt")) {
-            const match = text.match(/\d+/);
-            if (match) summaryFloor = parseInt(match[0]);
-          }
-        });
-      }
-    }
-    // --- Extract floor info ---
-
-    // Current floor: "Aukštas:"
-    // const currentFloorPattern = /Aukštas:\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
-
-    // Total floors: "Aukštų sk.:"
-    // const totalFloorPattern = /Aukštų sk\.:\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
-
-    // const currentFloorMatch = html.match(currentFloorPattern);
-    // const totalFloorMatch = html.match(totalFloorPattern);
-
-    // let currentFloor = currentFloorMatch ? parseInt(currentFloorMatch[1].trim()) : 0;
-    // let totalFloors = totalFloorMatch ? parseInt(totalFloorMatch[1].trim()) : 0;
-
-    // let floor = '';
-    // if (currentFloor && totalFloors) {
-    //   floor = `${currentFloor}/${totalFloors}`;
-    // } else if (currentFloor) {
-    //   floor = `${currentFloor}`;
-    // } 
-
-    // Extract obj-summary-details block
-    ///
-    // const doc = new DOMParser().parseFromString(html, "text/html");
-
-    
-    
-
     let currentFloor: number | null = null;
-    let totalFloors: number | null = null;
 
-    if (doc) {
-      const dts = doc.querySelectorAll("dt");
-
-      dts.forEach((dt) => {
-        const label = dt.textContent?.trim() || "";
-        const dd = dt.nextElementSibling;
-
-        if (!dd) return;
-
-        const valueText = dd.textContent?.trim() || "";
-
-        if (label.includes("Aukštas")) {
-          const match = valueText.match(/\d+/);
-          if (match) currentFloor = parseInt(match[0]);
-        }
-
-        if (label.includes("Aukštų")) {
-          const match = valueText.match(/\d+/);
-          if (match) totalFloors = parseInt(match[0]);
-        }
-      });
+    // Rooms
+    const roomsMatch = html.match(/(\d+)\s*kamb/i);
+    if (roomsMatch) {
+      rooms = parseInt(roomsMatch[1]);
     }
 
-    let floor = '';
-    if (currentFloor && totalFloors) {
-      floor = `${currentFloor}/${totalFloors}`;
-    } else if (currentFloor) {
-      floor = `${currentFloor}`;
+    // Area
+    const areaMatch = html.match(/([\d.,]+)\s*m²/i);
+    if (areaMatch) {
+      area = parseFloat(areaMatch[1].replace(",", "."));
     }
 
-    console.log("FLOOR:", floor);
-
+    // Floor
+    const floorMatch = html.match(/(\d+)\s*aukšt/i);
+    if (floorMatch) {
+      currentFloor = parseInt(floorMatch[1]);
+    }
+    const floor = currentFloor ? `${currentFloor}` : '';
 
     //console.log('Extracted floor:', floor);
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
-    console.log("HAS KAMB:", html.includes("kamb."));
-    const slice_ex =  html.slice(0, 2000);
-    const summary_det =  doc?.querySelector(".obj-summary-details");
-    const summaryText = summary_det?.textContent || null;
+    
     return c.json({
       address,
       district,
       yearBuilt,
       price,
-      floor, // or floor/totalFloors if you still need it
       rooms,
       area,
+      floor,
+      currentFloor,
       imageUrl,
-      summaryText,
-      slice_ex,
       url,
     });
   } catch (error) {
