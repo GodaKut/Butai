@@ -197,6 +197,7 @@ const floor = currentFloor !== null ? `${currentFloor}` : '';
       rooms,
       area,
       imageUrl,
+      doc,
       url,
     });
   } catch (error) {
