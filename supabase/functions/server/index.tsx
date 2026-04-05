@@ -194,9 +194,10 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
 
     //console.log('Extracted floor:', floor);
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
+    console.log("HAS KAMB:", scrapedData.html.includes("kamb."));
+    const slice_ex =  html.slice(0, 2000));
     
     return c.json({
-      html,
       address,
       district,
       yearBuilt,
@@ -205,6 +206,7 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       //rooms,
       //area,
       imageUrl,
+      slice_ex,
       doc,
       url,
     });
