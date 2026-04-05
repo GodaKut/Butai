@@ -150,40 +150,47 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     // } 
 
     // Extract obj-summary-details block
+    ///
+    // const doc = new DOMParser().parseFromString(html, "text/html");
+
+    
     const doc = new DOMParser().parseFromString(html, "text/html");
 
-    let rooms: number | null = null;
-    let area: number | null = null;
     let currentFloor: number | null = null;
+    let totalFloors: number | null = null;
 
     if (doc) {
-      const summary = doc.querySelector(".obj-summary-details");
+      const dts = doc.querySelectorAll("dt");
 
-      if (summary) {
-        const items = summary.querySelectorAll("span");
+      dts.forEach((dt) => {
+        const label = dt.textContent?.trim() || "";
+        const dd = dt.nextElementSibling;
 
-        items.forEach((span) => {
-          const text = span.textContent?.trim() || "";
+        if (!dd) return;
 
-          if (text.includes("kamb")) {
-            const match = text.match(/\d+/);
-            if (match) rooms = parseInt(match[0]);
-          }
+        const valueText = dd.textContent?.trim() || "";
 
-          if (text.includes("m²")) {
-            const match = text.match(/[\d.,]+/);
-            if (match) area = parseFloat(match[0].replace(",", "."));
-          }
+        if (label.includes("Aukštas")) {
+          const match = valueText.match(/\d+/);
+          if (match) currentFloor = parseInt(match[0]);
+        }
 
-          if (text.includes("aukšt")) {
-            const match = text.match(/\d+/);
-            if (match) currentFloor = parseInt(match[0]);
-          }
-        });
-      }
+        if (label.includes("Aukštų")) {
+          const match = valueText.match(/\d+/);
+          if (match) totalFloors = parseInt(match[0]);
+        }
+      });
     }
 
-const floor = currentFloor !== null ? `${currentFloor}` : '';
+    let floor = '';
+    if (currentFloor && totalFloors) {
+      floor = `${currentFloor}/${totalFloors}`;
+    } else if (currentFloor) {
+      floor = `${currentFloor}`;
+    }
+
+    console.log("FLOOR:", floor);
+
 
     //console.log('Extracted floor:', floor);
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
@@ -193,9 +200,9 @@ const floor = currentFloor !== null ? `${currentFloor}` : '';
       district,
       yearBuilt,
       price,
-      floor: currentFloor, // or floor/totalFloors if you still need it
-      rooms,
-      area,
+      floor, // or floor/totalFloors if you still need it
+      //rooms,
+      //area,
       imageUrl,
       doc,
       url,
