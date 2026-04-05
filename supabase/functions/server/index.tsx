@@ -128,32 +128,28 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     }
 
     // --- Extract floor info ---
-    let floor = '';
     let currentFloor = '';
     let totalFloors = '';
 
     // Match all dt/dd pairs
     // Match all dt/dd pairs
-    const matches = [...html.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi)];
+    const spanPattern = /<dt[^>]*>\s*([^<]+)\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d+)\s*<\/span>/gi;
+    const matches = [...html.matchAll(spanPattern)];
 
     for (const match of matches) {
-      const dt = match[1].replace(/\s+/g, ' ').trim();
-      const dd = match[2].replace(/\s+/g, ' ').trim();
+      const dtText = match[1].trim();
+      const ddValue = match[2].trim();
 
-      // Current floor
-      if (/Aukštas/i.test(dt) || /floor\.svg/i.test(dt)) {
-        const valueMatch = dd.match(/(\d+)/);
-        if (valueMatch) currentFloor = valueMatch[1];
+      if (/Aukštas/i.test(dtText)) {
+        currentFloor = ddValue;
       }
-
-      // Total floors
-      if (/Aukštų/i.test(dt) || /floors-count/i.test(dt)) {
-        const valueMatch = dd.match(/(\d+)/);
-        if (valueMatch) totalFloors = valueMatch[1];
+      if (/Aukštų/i.test(dtText)) {
+        totalFloors = ddValue;
       }
     }
 
     // Combine
+    let floor = '';
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
     } else if (currentFloor) {
