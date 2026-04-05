@@ -41,9 +41,9 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
       const scrapedData = await response.json();
       
       console.log('Scraped apartment data:', scrapedData);
-      console.log('Scraped floor data:', scrapedData.floor);
-      console.log('Scraped current floor data:', scrapedData.currentFloor);
-      console.log('Scraped total floors data:', scrapedData.totalFloors);
+      console.log('Scraped rooms:', scrapedData.rooms);
+      console.log('Scraped area:', scrapedData.area);
+      console.log('Scraped current floor:', scrapedData.currentFloor);
 
       // Add the apartment with scraped data, ensuring url and imageUrl are set
       onAdd({
@@ -51,10 +51,16 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
         district: scrapedData.district || 'Unknown District',
         yearBuilt: scrapedData.yearBuilt || new Date().getFullYear(),
         price: scrapedData.price || 0,
-        // Try to extract floor as a number from scrapedData or fallback to null
-        floor: scrapedData.floor && scrapedData.floor !== '' ? scrapedData.floor : null,
-        imageUrl: scrapedData.imageUrl && scrapedData.imageUrl !== '' ? scrapedData.imageUrl : 'https://via.placeholder.com/400x300?text=No+Image',
-        url: scrapedData.url || url, // fallback to the entered url
+        // Use currentFloor from scraping
+        floor: scrapedData.currentFloor ?? null,
+        // Add rooms and area
+        rooms: scrapedData.rooms ?? null,
+        area: scrapedData.area ?? null,
+        imageUrl:
+          scrapedData.imageUrl && scrapedData.imageUrl !== ''
+            ? scrapedData.imageUrl
+            : 'https://via.placeholder.com/400x300?text=No+Image',
+        url: scrapedData.url || url,
         status: 'interested',
       });
 
