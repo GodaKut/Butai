@@ -127,32 +127,32 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       yearBuilt = new Date().getFullYear();
     }
 
-  // Extract floor information (robust for Aukštas and total floors)
+    // --- Extract floor info ---
     let floor = '';
     let currentFloor = '';
     let totalFloors = '';
 
-
+    // Match all dt/dd pairs
     const matches = [...html.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi)];
 
     for (const match of matches) {
-      const dt = match[1];
-      const dd = match[2];
+      let dt = match[1].replace(/\s+/g, ' ').trim(); // normalize whitespace
+      let dd = match[2].replace(/\s+/g, ' ').trim();
 
-      // Current floor (Aukštas)
-      if (dt.includes('floor.svg') || dt.includes('Aukštas')) {
+      // Current floor
+      if (/Aukštas/i.test(dt) || /floor\.svg/i.test(dt)) {
         const valueMatch = dd.match(/\d+/);
-        if (valueMatch) currentFloor = valueMatch[0].trim();
+        if (valueMatch) currentFloor = valueMatch[0];
       }
 
-      // Total floors (Aukštų sk.)
-      if (dt.includes('floors-count') || dt.includes('Aukštų')) {
+      // Total floors
+      if (/Aukštų/i.test(dt) || /floors-count/i.test(dt)) {
         const valueMatch = dd.match(/\d+/);
-        if (valueMatch) totalFloors = valueMatch[0].trim();
+        if (valueMatch) totalFloors = valueMatch[0];
       }
     }
 
-    // Combine current floor and total floors into "2/5" format
+    // Combine into "2/5" format
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
     } else if (currentFloor) {
@@ -160,11 +160,11 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     }
 
     console.log("Extracted floor:", floor);
-
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
     console.log(html.match(/Aukštas[\s\S]{0,200}/i));
     console.log("HAS AUKSTAS:", html.includes("Aukštas"));
     console.log("HAS FLOOR.SVG:", html.includes("floor.svg"));
+    
     return c.json({
       address,
       district,
