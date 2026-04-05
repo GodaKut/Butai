@@ -1,5 +1,5 @@
 import { useDrag } from 'react-dnd';
-import { MapPin, Calendar, Euro, ExternalLink, Trash2 } from 'lucide-react';
+import { MapPin, Calendar, Euro, ExternalLink, Trash2, Home, Ruler } from 'lucide-react';
 import { Apartment, calculateFirstInstallment } from '../types/apartment';
 
 interface ApartmentCardProps {
@@ -33,6 +33,7 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
           <Trash2 className="w-5 h-5" />
         </button>
       )}
+
       {apartment.imageUrl && (
         <a
           ref={drag} 
@@ -52,6 +53,7 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
           </div>
         </a>
       )}
+
       <div className="p-4 space-y-3">
         <div>
           <h3 className="font-semibold text-gray-900 text-base">{apartment.address}</h3>
@@ -61,15 +63,31 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-sm text-gray-600">
+        <div className="flex items-center gap-3 text-sm text-gray-600">
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             <span>Built in {apartment.yearBuilt}</span>
           </div>
-          {apartment.floor !== null && apartment.floor !== undefined && (
-            <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-              Floor: {apartment.floor}
-            </span>
+
+          {apartment.floor && (
+            <div className="flex items-center gap-1">
+              <Home className="w-4 h-4" />
+              <span>Floor: {apartment.floor}</span>
+            </div>
+          )}
+
+          {apartment.rooms && (
+            <div className="flex items-center gap-1">
+              <Home className="w-4 h-4 rotate-45" /> {/* optional icon for rooms */}
+              <span>{apartment.rooms} rooms</span>
+            </div>
+          )}
+
+          {apartment.area && (
+            <div className="flex items-center gap-1">
+              <Ruler className="w-4 h-4" />
+              <span>{apartment.area} m²</span>
+            </div>
           )}
         </div>
 
