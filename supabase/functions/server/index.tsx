@@ -132,25 +132,19 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     let totalFloors = '';
 
     // Current floor: "Aukštas:"
-    const currentFloorPattern = /Aukštas:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d{1,2})\s*<\/span>/i;
-    const currentMatch = html.match(currentFloorPattern);
-    if (currentMatch) {
-      currentFloor = currentMatch[1].trim();
-    }
+    const currentFloorPattern = /Aukštas:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>([\s\S]*?)<\/span>/i;
+    currentFloor = extractNumber(currentFloorPattern);
 
     // Total floors: "Aukštų sk.:"
-    const totalFloorPattern = /Aukštų sk.:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d{1,2})\s*<\/span>/i;
-    const totalMatch = html.match(totalFloorPattern);
-    if (totalMatch) {
-      totalFloors = totalMatch[1].trim();
-    }
+    const totalFloorPattern = /Aukštų sk.:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>([\s\S]*?)<\/span>/i;
+    totalFloors = extractNumber(totalFloorPattern);
 
     // Combine into "floor/totalFloors"
     let floor = '';
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
     } else if (currentFloor) {
-      floor = currentFloor;
+      floor = `${currentFloor}`;
     }
 
     console.log('Extracted floor:', floor);
