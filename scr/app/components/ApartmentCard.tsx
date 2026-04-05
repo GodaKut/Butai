@@ -47,7 +47,7 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
             alt={apartment.address}
             className="w-full h-40 object-cover"
           />
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center pointer-events-none">
             <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         </a>
