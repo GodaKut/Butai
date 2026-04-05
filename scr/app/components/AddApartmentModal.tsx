@@ -49,7 +49,7 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
         yearBuilt: scrapedData.yearBuilt || new Date().getFullYear(),
         price: scrapedData.price || 0,
         // Try to extract floor as a number from scrapedData or fallback to null
-        floor: scrapedData.floor !== undefined && scrapedData.floor !== null && scrapedData.floor !== '' && !isNaN(Number(scrapedData.floor)) ? Number(scrapedData.floor) : null,
+        floor: scrapedData.floor && scrapedData.floor !== '' ? scrapedData.floor : null,
         imageUrl: scrapedData.imageUrl && scrapedData.imageUrl !== '' ? scrapedData.imageUrl : 'https://via.placeholder.com/400x300?text=No+Image',
         url: scrapedData.url || url, // fallback to the entered url
         status: 'interested',
