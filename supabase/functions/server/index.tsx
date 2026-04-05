@@ -128,6 +128,41 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       yearBuilt = new Date().getFullYear();
     }
 
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    let rooms: number | null = null;
+    let area: number | null = null;
+    let summaryFloor: number | null = null;
+
+    if (doc) {
+      const summary = doc.querySelector(".obj-summary-details");
+
+      console.log("SUMMARY FOUND:", !!summary);
+
+      if (summary) {
+        const spans = summary.querySelectorAll("span");
+
+        spans.forEach((span) => {
+          const text = span.textContent?.trim() || "";
+          console.log("SPAN:", text);
+
+          if (text.includes("kamb")) {
+            const match = text.match(/\d+/);
+            if (match) rooms = parseInt(match[0]);
+          }
+
+          if (text.includes("m²")) {
+            const match = text.match(/[\d.,]+/);
+            if (match) area = parseFloat(match[0].replace(",", "."));
+          }
+
+          if (text.includes("aukšt")) {
+            const match = text.match(/\d+/);
+            if (match) summaryFloor = parseInt(match[0]);
+          }
+        });
+      }
+    }
     // --- Extract floor info ---
 
     // Current floor: "Aukštas:"
@@ -154,7 +189,7 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     // const doc = new DOMParser().parseFromString(html, "text/html");
 
     
-    const doc = new DOMParser().parseFromString(html, "text/html");
+    
 
     let currentFloor: number | null = null;
     let totalFloors: number | null = null;
@@ -197,16 +232,17 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     console.log("HAS KAMB:", html.includes("kamb."));
     const slice_ex =  html.slice(0, 2000);
     const summary_det =  doc?.querySelector(".obj-summary-details");
+    const summaryText = summary_det?.textContent || null;
     return c.json({
       address,
       district,
       yearBuilt,
       price,
       floor, // or floor/totalFloors if you still need it
-      //rooms,
-      //area,
+      rooms,
+      area,
       imageUrl,
-      summary_det,
+      summaryText,
       slice_ex,
       url,
     });
