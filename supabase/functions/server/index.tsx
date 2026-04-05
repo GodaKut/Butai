@@ -130,20 +130,22 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     // --- Extract floor info ---
 
     // Current floor: "Aukštas:"
-    const currentFloorPattern = /Aukštas:\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d+)\s*<\/span>/i;
-     // Total floors: "Aukštų sk.:"
-    const totalFloorPattern =  /Aukštų sk\.\s*:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*(\d+)\s*<\/span>/i;
-    
+    const currentFloorPattern = /Aukštas:\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
+
+    // Total floors: "Aukštų sk.:"
+    const totalFloorPattern = /Aukštų sk\.\s*:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
+
     const currentFloorMatch = html.match(currentFloorPattern);
     const totalFloorMatch = html.match(totalFloorPattern);
 
     let currentFloor = currentFloorMatch ? parseInt(currentFloorMatch[1].trim()) : 0;
     let totalFloors = totalFloorMatch ? parseInt(totalFloorMatch[1].trim()) : 0;
 
-    let floor = `${currentFloor}`;
-    // Combine into "floor/totalFloors"
+    let floor = '';
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
+    } else if (currentFloor) {
+      floor = `${currentFloor}`;
     } 
 
     console.log('Extracted floor:', floor);
