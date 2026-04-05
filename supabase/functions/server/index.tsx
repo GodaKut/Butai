@@ -1,6 +1,7 @@
 import { Hono } from "npm:hono";
 import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
+import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 import * as kv from "./kv_store.tsx";
 const app = new Hono();
 
@@ -149,27 +150,40 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     // } 
 
     // Extract obj-summary-details block
-    const detailsBlockPattern = /<div[^>]*class="obj-summary-details"[^>]*>([\s\S]*?)<\/div>/i;
-    const detailsBlockMatch = html.match(detailsBlockPattern);
-    const detailsBlock = detailsBlockMatch ? detailsBlockMatch[1] : '';
+    const doc = new DOMParser().parseFromString(html, "text/html");
 
-    // Rooms (Kambariai)
-    const roomsPattern = /<img[^>]*alt="Kambariai"[^>]*>\s*<span>\s*(\d+)/i;
-    const roomsMatch = detailsBlock.match(roomsPattern);
-    const rooms = roomsMatch ? parseInt(roomsMatch[1]) : null;
+    let rooms: number | null = null;
+    let area: number | null = null;
+    let currentFloor: number | null = null;
 
-    // Area (Plotas)
-    const areaPattern = /<img[^>]*alt="Plotas"[^>]*>\s*<span>\s*([\d.,]+)/i;
-    const areaMatch = detailsBlock.match(areaPattern);
-    const area = areaMatch ? parseFloat(areaMatch[1].replace(',', '.')) : null;
+    if (doc) {
+      const summary = doc.querySelector(".obj-summary-details");
 
-    // Floor (Aukštas)
-    const floorPattern = /<img[^>]*alt="Aukštas"[^>]*>\s*<span>\s*(\d+)/i;
-    const floorMatch = detailsBlock.match(floorPattern);
-    const currentFloor = floorMatch ? parseInt(floorMatch[1]) : null;
+      if (summary) {
+        const items = summary.querySelectorAll("span");
 
-    // Optional: build string version if you still want it
-    const floor = currentFloor !== null ? `${currentFloor}` : '';
+        items.forEach((span) => {
+          const text = span.textContent?.trim() || "";
+
+          if (text.includes("kamb")) {
+            const match = text.match(/\d+/);
+            if (match) rooms = parseInt(match[0]);
+          }
+
+          if (text.includes("m²")) {
+            const match = text.match(/[\d.,]+/);
+            if (match) area = parseFloat(match[0].replace(",", "."));
+          }
+
+          if (text.includes("aukšt")) {
+            const match = text.match(/\d+/);
+            if (match) currentFloor = parseInt(match[0]);
+          }
+        });
+      }
+    }
+
+const floor = currentFloor !== null ? `${currentFloor}` : '';
 
     //console.log('Extracted floor:', floor);
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
