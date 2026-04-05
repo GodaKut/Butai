@@ -128,24 +128,19 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     }
 
     // --- Extract floor info ---
-    let currentFloor = '';
-    let totalFloors = '';
 
     // Current floor: "Aukštas:"
     const currentFloorPattern = /Aukštas:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>([\s\S]*?)<\/span>/i;
-    currentFloor = extractNumber(currentFloorPattern);
+    let currentFloor = extractNumber(currentFloorPattern);
 
     // Total floors: "Aukštų sk.:"
     const totalFloorPattern = /Aukštų sk.:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>([\s\S]*?)<\/span>/i;
-    totalFloors = extractNumber(totalFloorPattern);
-
+    let totalFloors = extractNumber(totalFloorPattern);
+    let floor = `${currentFloor}`;
     // Combine into "floor/totalFloors"
-    let floor = '';
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
-    } else if (currentFloor) {
-      floor = `${currentFloor}`;
-    }
+    } 
 
     console.log('Extracted floor:', floor);
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
