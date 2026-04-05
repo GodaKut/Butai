@@ -196,6 +196,7 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
     
     return c.json({
+      html,
       address,
       district,
       yearBuilt,
