@@ -130,25 +130,48 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     // --- Extract floor info ---
 
     // Current floor: "Aukštas:"
-    const currentFloorPattern = /Aukštas:\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
+    // const currentFloorPattern = /Aukštas:\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
 
     // Total floors: "Aukštų sk.:"
-    const totalFloorPattern = /Aukštų sk\.\s*:<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
+    // const totalFloorPattern = /Aukštų sk\.:\s*<\/dt>\s*<dd[^>]*>\s*<span[^>]*class="fieldValueContainer"[^>]*>\s*([\d]{1,2})\s*<\/span>/i;
 
-    const currentFloorMatch = html.match(currentFloorPattern);
-    const totalFloorMatch = html.match(totalFloorPattern);
+    // const currentFloorMatch = html.match(currentFloorPattern);
+    // const totalFloorMatch = html.match(totalFloorPattern);
 
-    let currentFloor = currentFloorMatch ? parseInt(currentFloorMatch[1].trim()) : 0;
-    let totalFloors = totalFloorMatch ? parseInt(totalFloorMatch[1].trim()) : 0;
+    // let currentFloor = currentFloorMatch ? parseInt(currentFloorMatch[1].trim()) : 0;
+    // let totalFloors = totalFloorMatch ? parseInt(totalFloorMatch[1].trim()) : 0;
 
-    let floor = '';
-    if (currentFloor && totalFloors) {
-      floor = `${currentFloor}/${totalFloors}`;
-    } else if (currentFloor) {
-      floor = `${currentFloor}`;
-    } 
+    // let floor = '';
+    // if (currentFloor && totalFloors) {
+    //   floor = `${currentFloor}/${totalFloors}`;
+    // } else if (currentFloor) {
+    //   floor = `${currentFloor}`;
+    // } 
 
-    console.log('Extracted floor:', floor);
+    // Extract obj-summary-details block
+    const detailsBlockPattern = /<div[^>]*class="obj-summary-details"[^>]*>([\s\S]*?)<\/div>/i;
+    const detailsBlockMatch = html.match(detailsBlockPattern);
+    const detailsBlock = detailsBlockMatch ? detailsBlockMatch[1] : '';
+
+    // Rooms (Kambariai)
+    const roomsPattern = /<img[^>]*alt="Kambariai"[^>]*>\s*<span>\s*(\d+)/i;
+    const roomsMatch = detailsBlock.match(roomsPattern);
+    const rooms = roomsMatch ? parseInt(roomsMatch[1]) : null;
+
+    // Area (Plotas)
+    const areaPattern = /<img[^>]*alt="Plotas"[^>]*>\s*<span>\s*([\d.,]+)/i;
+    const areaMatch = detailsBlock.match(areaPattern);
+    const area = areaMatch ? parseFloat(areaMatch[1].replace(',', '.')) : null;
+
+    // Floor (Aukštas)
+    const floorPattern = /<img[^>]*alt="Aukštas"[^>]*>\s*<span>\s*(\d+)/i;
+    const floorMatch = detailsBlock.match(floorPattern);
+    const currentFloor = floorMatch ? parseInt(floorMatch[1]) : null;
+
+    // Optional: build string version if you still want it
+    const floor = currentFloor !== null ? `${currentFloor}` : '';
+
+    //console.log('Extracted floor:', floor);
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
     
     return c.json({
@@ -156,9 +179,9 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       district,
       yearBuilt,
       price,
-      floor,
-      currentFloor,
-      totalFloors,
+      floor: currentFloor, // or floor/totalFloors if you still need it
+      rooms,
+      area,
       imageUrl,
       url,
     });
