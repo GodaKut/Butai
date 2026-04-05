@@ -129,17 +129,42 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
 
     // Extract floor information (robust for Aukštas and floor.svg)
     let floor = '';
-    const floorSvgPattern = /<dt[^>]*>\s*<img[^>]*floor\.svg[^>]*>[\s\S]*?<\/dt>\s*<dd[^>]*>[\s\S]*?<span[^>]*>\s*(\d+)\s*<\/span>/i;
-    const floorSvgMatch = html.match(floorSvgPattern);
-    if (floorSvgMatch) {
-      floor = floorSvgMatch[1];
-    } else {
-      const floorPattern = /Aukštas:<\/dt>\s*<dd[^>]*>([^<]+)<\/dd>/i;
-      const floorAlt = /aukštas[^>]*>.*?(\d+)[^<]*<\//i;
-      floor = extractText(floorPattern);
-      if (!floor) {
-        floor = extractText(floorAlt);
+   
+
+    // Match all dt/dd pairs
+    const matches = [...html.matchAll(
+      /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi
+    )];
+
+    let currentFloor = '';
+    let totalFloors = '';
+
+    for (const match of matches) {
+      const dt = match[1];
+      const dd = match[2];
+
+      // Floor (Aukštas)
+      if (dt.includes('floor.svg') || dt.includes('Aukštas')) {
+        const valueMatch = dd.match(/\d+/);
+        if (valueMatch) {
+          currentFloor = valueMatch[0];
+        }
       }
+
+      // Total floors (Aukštų sk.)
+      if (dt.includes('floors-count') || dt.includes('Aukštų')) {
+        const valueMatch = dd.match(/\d+/);
+        if (valueMatch) {
+          totalFloors = valueMatch[0];
+        }
+      }
+    }
+
+    // Combine result
+    if (currentFloor && totalFloors) {
+      floor = `${currentFloor}/${totalFloors}`;
+    } else if (currentFloor) {
+      floor = currentFloor;
     }
 
     // Extract image URL
