@@ -42,6 +42,8 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
       
       console.log('Scraped apartment data:', scrapedData);
       console.log('Scraped floor data:', scrapedData.floor);
+      console.log('Scraped current floor data:', scrapedData.currentFloor);
+      console.log('Scraped total floors data:', scrapedData.totalFloors);
 
       // Add the apartment with scraped data, ensuring url and imageUrl are set
       onAdd({
