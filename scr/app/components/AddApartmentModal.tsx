@@ -41,6 +41,7 @@ export function AddApartmentModal({ isOpen, onClose, onAdd }: AddApartmentModalP
       const scrapedData = await response.json();
       
       console.log('Scraped apartment data:', scrapedData);
+      console.log("HAS SUMMARY:", !!doc?.querySelector(".obj-summary-details"));
       console.log('Scraped rooms:', scrapedData.rooms);
       console.log('Scraped area:', scrapedData.area);
       console.log('Scraped current floor:', scrapedData.currentFloor);
