@@ -133,38 +133,35 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
     let totalFloors = '';
 
     // Match all dt/dd pairs
+    // Match all dt/dd pairs
     const matches = [...html.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi)];
 
     for (const match of matches) {
-      let dt = match[1].replace(/\s+/g, ' ').trim(); // normalize whitespace
-      let dd = match[2].replace(/\s+/g, ' ').trim();
+      const dt = match[1].replace(/\s+/g, ' ').trim();
+      const dd = match[2].replace(/\s+/g, ' ').trim();
 
-      // Floor (current)
+      // Current floor
       if (/Aukštas/i.test(dt) || /floor\.svg/i.test(dt)) {
-        // Look inside the span for the actual number
-        const valueMatch = dd.match(/<span[^>]*class="[^"]*fieldValueContainer[^"]*"[^>]*>\s*(\d+)\s*<\/span>/i);
+        const valueMatch = dd.match(/(\d+)/);
         if (valueMatch) currentFloor = valueMatch[1];
       }
 
       // Total floors
       if (/Aukštų/i.test(dt) || /floors-count/i.test(dt)) {
-        const valueMatch = dd.match(/<span[^>]*class="[^"]*fieldValueContainer[^"]*"[^>]*>\s*(\d+)\s*<\/span>/i);
+        const valueMatch = dd.match(/(\d+)/);
         if (valueMatch) totalFloors = valueMatch[1];
       }
     }
 
-    // Combine into "2/5" format
+    // Combine
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
     } else if (currentFloor) {
       floor = currentFloor;
     }
 
-    console.log("Extracted floor:", floor);
+    console.log('Extracted floor:', floor);
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
-    console.log(html.match(/Aukštas[\s\S]{0,200}/i));
-    console.log("HAS AUKSTAS:", html.includes("Aukštas"));
-    console.log("HAS FLOOR.SVG:", html.includes("floor.svg"));
     
     return c.json({
       address,
