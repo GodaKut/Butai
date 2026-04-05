@@ -127,53 +127,42 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       yearBuilt = new Date().getFullYear();
     }
 
-    // Extract floor information (robust for Aukštas and floor.svg)
+  // Extract floor information (robust for Aukštas and total floors)
     let floor = '';
-   
 
-    // Match all dt/dd pairs
-    const matches = [...html.matchAll(
-      /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi
-    )];
+    // Match all <dt>/<dd> pairs
+    const dtDdMatches = [...html.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi)];
 
     let currentFloor = '';
     let totalFloors = '';
 
-    for (const match of matches) {
-      const dt = match[1];
-      const dd = match[2];
+    for (const match of dtDdMatches) {
+      const dtContent = match[1]; // Content inside <dt>
+      const ddContent = match[2]; // Content inside <dd>
 
-      // Floor (Aukštas)
-      if (dt.includes('floor.svg') || dt.includes('Aukštas')) {
-        const valueMatch = dd.match(/\d+/);
-        if (valueMatch) {
-          currentFloor = valueMatch[0];
-        }
+      // Check for current floor (Aukštas)
+      if (/floor\.svg/i.test(dtContent) || /Aukštas/i.test(dtContent)) {
+        const valueMatch = ddContent.match(/\d+/);
+        if (valueMatch) currentFloor = valueMatch[0].trim();
       }
 
-      // Total floors (Aukštų sk.)
-      if (dt.includes('floors-count') || dt.includes('Aukštų')) {
-        const valueMatch = dd.match(/\d+/);
-        if (valueMatch) {
-          totalFloors = valueMatch[0];
-        }
+      // Check for total floors (Aukštų sk.)
+      if (/floors-count/i.test(dtContent) || /Aukštų/i.test(dtContent)) {
+        const valueMatch = ddContent.match(/\d+/);
+        if (valueMatch) totalFloors = valueMatch[0].trim();
       }
     }
 
-    // Combine result
+    // Combine floor info
     if (currentFloor && totalFloors) {
       floor = `${currentFloor}/${totalFloors}`;
     } else if (currentFloor) {
       floor = currentFloor;
+    } else {
+      floor = ''; // fallback if nothing found
     }
 
-    // Extract image URL
-    const imagePattern = /<meta\s+property="og:image"\s+content="([^"]+)"/i;
-    const imageAlt = /<img[^>]*class="[^"]*main-photo[^"]*"[^>]*src="([^"]+)"/i;
-    let imageUrl = extractText(imagePattern);
-    if (!imageUrl) {
-      imageUrl = extractText(imageAlt);
-    }
+    console.log("Extracted floor:", floor);
 
     console.log('Extracted data:', { address, district, yearBuilt, price, floor, imageUrl });
     console.log(html.match(/Aukštas[\s\S]{0,200}/i));
