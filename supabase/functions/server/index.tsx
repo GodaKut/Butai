@@ -139,16 +139,17 @@ app.post("/make-server-e770b7da/scrape", async (c) => {
       let dt = match[1].replace(/\s+/g, ' ').trim(); // normalize whitespace
       let dd = match[2].replace(/\s+/g, ' ').trim();
 
-      // Current floor
+      // Floor (current)
       if (/Aukštas/i.test(dt) || /floor\.svg/i.test(dt)) {
-        const valueMatch = dd.match(/\d+/);
-        if (valueMatch) currentFloor = valueMatch[0];
+        // Look inside the span for the actual number
+        const valueMatch = dd.match(/<span[^>]*class="[^"]*fieldValueContainer[^"]*"[^>]*>\s*(\d+)\s*<\/span>/i);
+        if (valueMatch) currentFloor = valueMatch[1];
       }
 
       // Total floors
       if (/Aukštų/i.test(dt) || /floors-count/i.test(dt)) {
-        const valueMatch = dd.match(/\d+/);
-        if (valueMatch) totalFloors = valueMatch[0];
+        const valueMatch = dd.match(/<span[^>]*class="[^"]*fieldValueContainer[^"]*"[^>]*>\s*(\d+)\s*<\/span>/i);
+        if (valueMatch) totalFloors = valueMatch[1];
       }
     }
 
