@@ -1,6 +1,8 @@
 import { useDrop } from 'react-dnd';
 import { Apartment } from '../types/apartment';
 import { ApartmentCard } from './ApartmentCard';
+import { useEffect, useRef } from 'react';
+const columnRef = useRef<HTMLDivElement>(null);
 
 interface KanbanColumnProps {
   columnId: string;
@@ -8,6 +10,8 @@ interface KanbanColumnProps {
   apartments: Apartment[];
   onMoveApartment: (apartmentId: string, newStatus: Apartment['status']) => void;
   onDeleteApartment?: (apartmentId: number | string) => void;
+  maxHeight?: number;
+  registerHeight: (el: HTMLDivElement | null) => void;
 }
 
 export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onDeleteApartment }: KanbanColumnProps) {
@@ -22,7 +26,14 @@ export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onD
   }));
 
   return (
-    <div className="flex flex-col w-80">
+    <div
+     ref={(el) => {
+      columnRef.current = el;
+      registerHeight(el);
+    }}
+    style={{ height: maxHeight ? `${maxHeight}px` : 'auto' }} 
+    className="flex flex-col w-80"
+    >
       <div className="bg-gray-100 rounded-t-lg px-4 py-3 border-b-2 border-gray-300">
         <h2 className="font-semibold text-gray-700 text-sm uppercase tracking-wide">
           {title}

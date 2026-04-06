@@ -1,9 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
 import { Apartment } from '../types/apartment';
 import { KanbanColumn } from './KanbanColumn';
 import { AddApartmentModal } from './AddApartmentModal';
 import { supabase } from '../../../utils/supabase/client';
+
+const columnRefs = useRef<HTMLDivElement[]>([]);
+const [maxHeight, setMaxHeight] = useState(0);
+const registerHeight = (el: HTMLDivElement | null) => {
+  if (el && !columnRefs.current.includes(el)) {
+    columnRefs.current.push(el);
+  }
+};
+useEffect(() => {
+  if (columnRefs.current.length === 0) return;
+
+  const heights = columnRefs.current.map((el) => el.offsetHeight);
+  const tallest = Math.max(...heights);
+
+  setMaxHeight(tallest);
+}, [apartments]);
 
 const COLUMNS = [
   { id: 'interested', title: 'Interested' },
@@ -85,6 +101,8 @@ export function KanbanBoard() {
               apartments={apartments.filter((apt) => apt.status === column.id)}
               onMoveApartment={moveApartment}
               onDeleteApartment={deleteApartment}
+              registerHeight={registerHeight}
+              maxHeight={maxHeight}
             />
           ))}
         </div>
