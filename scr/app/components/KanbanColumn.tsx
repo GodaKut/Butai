@@ -22,7 +22,7 @@ export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onD
   }));
 
   return (
-    <div className="flex flex-col w-80 flex-shrink-0 h-full">
+    <div className="flex flex-col w-80">
       <div className="bg-gray-100 rounded-t-lg px-4 py-3 border-b-2 border-gray-300">
         <h2 className="font-semibold text-gray-700 text-sm uppercase tracking-wide">
           {title}
@@ -31,7 +31,7 @@ export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onD
       </div>
       <div
         ref={drop}
-        className={`flex-1 bg-gray-50 rounded-b-lg p-3 space-y-3 min-h-[200px] transition-colors ${
+        className={`bg-gray-50 rounded-b-lg p-3 space-y-3 min-h-[200px] transition-colors ${
           isOver ? 'bg-blue-50 border-2 border-blue-300 border-dashed' : 'border border-gray-200'
         }`}
       >
