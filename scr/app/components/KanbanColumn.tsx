@@ -2,7 +2,7 @@ import { useDrop } from 'react-dnd';
 import { Apartment } from '../types/apartment';
 import { ApartmentCard } from './ApartmentCard';
 import { useEffect, useRef } from 'react';
-const columnRef = useRef<HTMLDivElement>(null);
+
 
 interface KanbanColumnProps {
   columnId: string;
@@ -14,7 +14,8 @@ interface KanbanColumnProps {
   registerHeight: (el: HTMLDivElement | null) => void;
 }
 
-export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onDeleteApartment }: KanbanColumnProps) {
+export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onDeleteApartment, maxHeight, registerHeight }: KanbanColumnProps) {
+  const columnRef = useRef<HTMLDivElement>(null);
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'apartment',
     drop: (item: { id: string }) => {
