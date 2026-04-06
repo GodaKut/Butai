@@ -76,7 +76,7 @@ export function KanbanBoard() {
       </header>
 
       <div className="flex-1 overflow-x-auto p-6">
-        <div className="flex gap-4 items-start min-w-max">
+        <div className="flex gap-4 items-stretch min-w-max">
           {COLUMNS.map((column) => (
             <KanbanColumn
               key={column.id}
