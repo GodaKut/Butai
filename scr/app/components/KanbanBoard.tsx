@@ -61,7 +61,7 @@ export function KanbanBoard() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Apartment Hunt</h1>
@@ -76,7 +76,7 @@ export function KanbanBoard() {
       </header>
 
       <div className="flex-1 overflow-x-auto p-6">
-        <div className="flex gap-4 h-full min-w-max">
+        <div className="flex gap-4 items-start min-w-max">
           {COLUMNS.map((column) => (
             <KanbanColumn
               key={column.id}
