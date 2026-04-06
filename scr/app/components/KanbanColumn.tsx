@@ -33,7 +33,7 @@ export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onD
       registerHeight(el);
     }}
     style={{ height: maxHeight ? `${maxHeight}px` : 'auto' }} 
-    className="flex flex-col w-80"
+    className="flex flex-col w-80 h-[calc(100vh-120px)]"
     >
       <div className="bg-gray-100 rounded-t-lg px-4 py-3 border-b-2 border-gray-300">
         <h2 className="font-semibold text-gray-700 text-sm uppercase tracking-wide">
@@ -43,7 +43,7 @@ export function KanbanColumn({ columnId, title, apartments, onMoveApartment, onD
       </div>
       <div
         ref={drop}
-        className={`bg-gray-50 rounded-b-lg p-3 space-y-3 min-h-[200px] transition-colors ${
+        className={`flex-1 overflow-y-auto bg-gray-50 rounded-b-lg p-3 space-y-3 min-h-[200px] transition-colors ${
           isOver ? 'bg-blue-50 border-2 border-blue-300 border-dashed' : 'border border-gray-200'
         }`}
       >
