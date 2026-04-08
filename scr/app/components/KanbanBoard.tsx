@@ -7,13 +7,6 @@ import { SetViewingModal } from './SetViewingModal';
 import { supabase } from '../../../utils/supabase/client';
 
 
-const [pendingMove, setPendingMove] = useState<{
-  apartmentId: number;
-  newStatus: Apartment['status'];
-} | null>(null);
-
-const [isModalOpen, setIsModalOpen] = useState(false);
-
 const COLUMNS = [
   { id: 'interested', title: 'Interested' },
   { id: 'patricija-approves', title: 'Patricija Approves' },
@@ -24,7 +17,6 @@ const COLUMNS = [
 
 export function KanbanBoard() {
   const [apartments, setApartments] = useState<Apartment[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const columnRefs = useRef<HTMLDivElement[]>([]);
@@ -34,6 +26,14 @@ export function KanbanBoard() {
       columnRefs.current.push(el);
     }
   };
+  const [pendingMove, setPendingMove] = useState<{
+    apartmentId: number;
+    newStatus: Apartment['status'];
+  } | null>(null);
+
+  const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
   useEffect(() => {
     if (columnRefs.current.length === 0) return;
@@ -56,10 +56,10 @@ export function KanbanBoard() {
     fetchApartments();
   }, []);
 
-  const moveApartment = async (apartmentId: string, newStatus: Apartment['status']) => {
+  const moveApartment = async (apartmentId: number, newStatus: Apartment['status']) => {
     if (newStatus === 'to-view') {
       setPendingMove({ apartmentId, newStatus });
-      setIsModalOpen(true);
+      setIsViewingModalOpen(true);
       return;
     }
 
@@ -134,7 +134,7 @@ export function KanbanBoard() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Apartment Hunt</h1>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsAddModalOpen(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -161,15 +161,15 @@ export function KanbanBoard() {
       </div>
 
       <AddApartmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
         onAdd={addApartment}
       />
 
       <SetViewingModal
-        isOpen={isModalOpen}
+        isOpen={isViewingModalOpen}
         onClose={() => {
-          setIsModalOpen(false);
+          setIsViewingModalOpen(false);
           setPendingMove(null);
         }}
         onConfirm={handleSetViewing}
