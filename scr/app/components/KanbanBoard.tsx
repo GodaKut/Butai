@@ -3,9 +3,16 @@ import { Plus } from 'lucide-react';
 import { Apartment } from '../types/apartment';
 import { KanbanColumn } from './KanbanColumn';
 import { AddApartmentModal } from './AddApartmentModal';
+import { SetViewingModal } from './SetViewingModal';
 import { supabase } from '../../../utils/supabase/client';
 
 
+const [pendingMove, setPendingMove] = useState<{
+  apartmentId: number;
+  newStatus: Apartment['status'];
+} | null>(null);
+
+const [isModalOpen, setIsModalOpen] = useState(false);
 
 const COLUMNS = [
   { id: 'interested', title: 'Interested' },
@@ -50,48 +57,54 @@ export function KanbanBoard() {
   }, []);
 
   const moveApartment = async (apartmentId: string, newStatus: Apartment['status']) => {
-    let viewing_datetime: string | null = null;
-
-    // 👉 ONLY trigger when moving to "To View"
     if (newStatus === 'to-view') {
-      const userInput = prompt('Enter viewing date & time (YYYY-MM-DD HH:MM)');
-      
-      if (!userInput) return; // cancel if user closes prompt
-
-      const date = new Date(userInput);
-
-      if (isNaN(date.getTime())) {
-        alert('Invalid date format');
-        return;
-      }
-
-      viewing_datetime = date.toISOString();
+      setPendingMove({ apartmentId, newStatus });
+      setIsModalOpen(true);
+      return;
     }
 
-    // 👉 update UI immediately
+    // normal move
+    setApartments((prev) =>
+      prev.map((apt) =>
+        apt.id === apartmentId
+          ? { ...apt, status: newStatus }
+          : apt
+      )
+    );
+
+    await supabase
+      .from('apartments')
+      .update({ status: newStatus })
+      .eq('id', apartmentId);
+  };
+
+  const handleSetViewing = async (datetime: string) => {
+    if (!pendingMove) return;
+
+    const { apartmentId, newStatus } = pendingMove;
+
     setApartments((prev) =>
       prev.map((apt) =>
         apt.id === apartmentId
           ? {
               ...apt,
               status: newStatus,
-              viewing_datetime: viewing_datetime,
+              viewing_datetime: datetime,
             }
           : apt
       )
     );
 
-    // 👉 update database
     await supabase
       .from('apartments')
       .update({
         status: newStatus,
-        viewing_datetime: viewing_datetime,
+        viewing_datetime: datetime,
       })
       .eq('id', apartmentId);
+
+    setPendingMove(null);
   };
-
-
   const addApartment = async (apartment: Omit<Apartment, 'id'>) => {
     const newApartment = {
       ...apartment,
@@ -152,6 +165,15 @@ export function KanbanBoard() {
         onClose={() => setIsModalOpen(false)}
         onAdd={addApartment}
       />
+
+      <SetViewingModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setPendingMove(null);
+        }}
+        onConfirm={handleSetViewing}
+       />
     </div>
   );
 }
