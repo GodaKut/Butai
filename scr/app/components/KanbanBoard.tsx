@@ -150,7 +150,24 @@ export function KanbanBoard() {
               key={column.id}
               columnId={column.id}
               title={column.title}
-              apartments={apartments.filter((apt) => apt.status === column.id)}
+              apartments={
+                apartments
+                .filter((apt) => apt.status === column.id)
+                .sort((a, b) => {
+                //  ONLY sort "to-view"
+                  if (column.id !== 'to-view') return 0;
+
+                  const dateA = a.viewing_datetime
+                    ? new Date(a.viewing_datetime).getTime()
+                    : Infinity;
+
+                  const dateB = b.viewing_datetime
+                    ? new Date(b.viewing_datetime).getTime()
+                    : Infinity;
+
+                  return dateA - dateB;
+                })
+              }
               onMoveApartment={moveApartment}
               onDeleteApartment={deleteApartment}
               registerHeight={registerHeight}
