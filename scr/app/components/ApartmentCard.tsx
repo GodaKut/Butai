@@ -109,16 +109,8 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
               </span>
             </div>
           )}
-        </div>
 
-        <div className="pt-2 border-t border-gray-100 space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Price</span>
-            <div className="flex items-center gap-1 text-lg font-bold text-gray-900">
-              <Euro className="w-5 h-5" />
-              </span>
-            </div>
-          )}
+
         </div>
 
         <div className="pt-2 border-t border-gray-100 space-y-1">
