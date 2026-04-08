@@ -50,11 +50,47 @@ export function KanbanBoard() {
   }, []);
 
   const moveApartment = async (apartmentId: string, newStatus: Apartment['status']) => {
+    let viewing_datetime: string | null = null;
+
+    // 👉 ONLY trigger when moving to "To View"
+    if (newStatus === 'to-view') {
+      const userInput = prompt('Enter viewing date & time (YYYY-MM-DD HH:MM)');
+      
+      if (!userInput) return; // cancel if user closes prompt
+
+      const date = new Date(userInput);
+
+      if (isNaN(date.getTime())) {
+        alert('Invalid date format');
+        return;
+      }
+
+      viewing_datetime = date.toISOString();
+    }
+
+    // 👉 update UI immediately
     setApartments((prev) =>
-      prev.map((apt) => (apt.id === apartmentId ? { ...apt, status: newStatus } : apt))
+      prev.map((apt) =>
+        apt.id === apartmentId
+          ? {
+              ...apt,
+              status: newStatus,
+              viewing_datetime: viewing_datetime,
+            }
+          : apt
+      )
     );
-    await supabase.from('apartments').update({ status: newStatus }).eq('id', apartmentId);
+
+    // 👉 update database
+    await supabase
+      .from('apartments')
+      .update({
+        status: newStatus,
+        viewing_datetime: viewing_datetime,
+      })
+      .eq('id', apartmentId);
   };
+
 
   const addApartment = async (apartment: Omit<Apartment, 'id'>) => {
     const newApartment = {

@@ -89,6 +89,36 @@ export function ApartmentCard({ apartment, onDelete }: ApartmentCardProps) {
               <span>{apartment.area} m²</span>
             </div>
           )}
+
+          {apartment.status === 'to-view' && apartment.viewing_datetime && (
+            <div className="flex items-center gap-2 text-sm text-purple-600">
+              <Calendar className="w-4 h-4" />
+              <span>
+                Viewing:{' '}
+                {new Date(apartment.viewing_datetime).toLocaleString()}
+              </span>
+            </div>
+          )}
+
+          {apartment.status === 'to-view' && apartment.viewing_notes && (
+            <div className="flex items-center gap-2 text-sm text-purple-600">
+              <Calendar className="w-4 h-4" />
+              <span>
+                Viewing Notes:{' '}
+                {apartment.viewing_notes}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="pt-2 border-t border-gray-100 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Price</span>
+            <div className="flex items-center gap-1 text-lg font-bold text-gray-900">
+              <Euro className="w-5 h-5" />
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="pt-2 border-t border-gray-100 space-y-1">

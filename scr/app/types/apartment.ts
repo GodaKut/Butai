@@ -11,6 +11,8 @@ export interface Apartment {
   rooms: number;
   area: string;
   currentFloor: string;
+  viewing_datetime?: string | null; 
+  viewing_notes?: string | null;
 }
 
 export const calculateFirstInstallment = (price: number): number => {
